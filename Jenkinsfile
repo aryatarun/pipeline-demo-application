@@ -1,6 +1,6 @@
-stage 'First Stage'
+stage 'Commit-Stage'
 
-echo 'This will be our Continuous Delivery pipeline soon (tm)'
+git url: 'https://github.com/cloudfoundry-samples/pong_matcher_spring.git'
 
-
-stage 'Second Stage'
+def mvnHome = tool 'M3'
+sh "${mvnHome}/bin/mvn -B verify"
