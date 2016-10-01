@@ -2,7 +2,7 @@ stage 'Commit-Stage'
 
 
 node {
-  git url: 'https://github.com/cloudfoundry-samples/pong_matcher_spring.git'
+  git url: 'git@bitbucket.org:thomasanderer/pipeline-demo.git'
 
 
   def mvnHome = tool 'M3'
