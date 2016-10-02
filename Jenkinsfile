@@ -24,13 +24,18 @@ def mvnHome = tool 'M3'
 
   stage ('CI-Build') {
 
-  sh "${mvnHome}/bin/mvn -B verify"
+    sh "${mvnHome}/bin/mvn -B verify"
 
-  junit 'target/surefire-reports/**.xml'
+    junit 'target/surefire-reports/**.xml'
 
-  step([$class: 'FindBugsPublisher', canComputeNew: false, defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', pattern: '**/findbugs.xml', unHealthy: ''])
+    step([$class: 'FindBugsPublisher', canComputeNew: false, defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', pattern: '**/findbugs.xml', unHealthy: ''])
 
-  step([$class: 'AnalysisPublisher', canComputeNew: false, defaultEncoding: '', healthy: '', unHealthy: ''])
+    step([$class: 'AnalysisPublisher', canComputeNew: false, defaultEncoding: '', healthy: '', unHealthy: ''])
 
   }
+
+  //Acceptance test (maybe cf?)
+  //Parallel performance test (maybe curl?)
+  //Manual step -> manual acceptance
+  //release to production (cf b/g?)
 }
