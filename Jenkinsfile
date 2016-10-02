@@ -16,7 +16,7 @@ def mvnHome = tool 'M3'
     def now = new Date()
     def date = now.format("yyyyMMdd", TimeZone.getTimeZone('UTC'))
     def time = now.format("HHmmss", TimeZone.getTimeZone('UTC'))
-    def newVersion = "${version["MVN"]}-${date}_${time}_${version["COMMIT"]}
+    def newVersion = "${version['MVN']}-${date}_${time}_${version['COMMIT']}"
 
 
   }
