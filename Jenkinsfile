@@ -9,9 +9,9 @@ node {
   def mvnHome = tool 'M3'
   sh "${mvnHome}/bin/mvn -B verify"
 
-  junit ''
+  junit 'target/surefire-reports/**.xml'
 
-  step([$class: 'FindBugsPublisher', canComputeNew: false, defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', pattern: '**/findbugsXml.xml', unHealthy: ''])
+  step([$class: 'FindBugsPublisher', canComputeNew: false, defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', pattern: '**/findbugs.xml', unHealthy: ''])
 
   step([$class: 'AnalysisPublisher', canComputeNew: false, defaultEncoding: '', healthy: '', unHealthy: ''])
 
