@@ -14,7 +14,7 @@ def mvnHome = tool 'M3'
     echo "Pom-Version=$version"
 
     def now = java.time.Clock.systemUTC().instant();
-    DateTimeFormatter dtf = java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+    def dtf = java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
     def date = dtf.format(now)
     def time = dtf.format(now)
     def newVersion = "${version['MVN']}-${date}_${time}_${version['COMMIT']}"
