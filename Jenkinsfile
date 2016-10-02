@@ -17,11 +17,12 @@ def mvnHome = tool 'M3'
     def newVersion = "${version['MVN']}-${version['TIMESTAMP']}_${version['COMMIT']}"
     echo "Automated version: ${newVersion}"
 
+    sh "${mvnHome}/bin/mvn mvn -DnewVersion=\"${newVersion}\""
   }
 
   stage ('CI-Build') {
 
-  //sh "${mvnHome}/bin/mvn -B verify"
+  sh "${mvnHome}/bin/mvn -B verify"
 
   //junit 'target/surefire-reports/**.xml'
 
