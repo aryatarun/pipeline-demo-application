@@ -10,7 +10,7 @@ def mvnHome = tool 'M3'
       echo "MVN=`${mvnHome}/bin/mvn -q -Dexec.executable="echo" -Dexec.args='\${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.3.1:exec`" > version.properties
       echo "COMMIT=`git rev-parse HEAD --short`"
     """
-    def version = readProperties 'version.properties'
+    def version = readProperties file: 'version.properties'
     echo "Pom-Version=$version"
 
     def now = new Date()
