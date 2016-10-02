@@ -17,18 +17,20 @@ def mvnHome = tool 'M3'
     def newVersion = "${version['MVN']}-${version['TIMESTAMP']}_${version['COMMIT']}"
     echo "Automated version: ${newVersion}"
 
-    sh "${mvnHome}/bin/mvn mvn -DnewVersion=\"${newVersion}\""
+    sh "${mvnHome}/bin/mvn versions:set -DnewVersion=\"${newVersion}\""
+
+    //Should push the version back to repo
   }
 
   stage ('CI-Build') {
 
   sh "${mvnHome}/bin/mvn -B verify"
 
-  //junit 'target/surefire-reports/**.xml'
+  junit 'target/surefire-reports/**.xml'
 
-  //step([$class: 'FindBugsPublisher', canComputeNew: false, defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', pattern: '**/findbugs.xml', unHealthy: ''])
+  step([$class: 'FindBugsPublisher', canComputeNew: false, defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', pattern: '**/findbugs.xml', unHealthy: ''])
 
-  //step([$class: 'AnalysisPublisher', canComputeNew: false, defaultEncoding: '', healthy: '', unHealthy: ''])
+  step([$class: 'AnalysisPublisher', canComputeNew: false, defaultEncoding: '', healthy: '', unHealthy: ''])
 
   }
 }
