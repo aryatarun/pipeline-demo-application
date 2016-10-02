@@ -13,9 +13,10 @@ def mvnHome = tool 'M3'
     def version = readProperties file: 'version.properties'
     echo "Pom-Version=$version"
 
-    def now = new Date()
-    def date = now.format("yyyyMMdd", TimeZone.getTimeZone('UTC'))
-    def time = now.format("HHmmss", TimeZone.getTimeZone('UTC'))
+    def now = Clock.systemUTC().instant();
+    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+    def date = dtf.format(now)
+    def time = dtf.format(now)
     def newVersion = "${version['MVN']}-${date}_${time}_${version['COMMIT']}"
 
 
