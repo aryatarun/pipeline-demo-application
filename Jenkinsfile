@@ -15,7 +15,7 @@ def mvnHome = tool 'M3'
     echo "Pom-Version=$version"
 
     def newVersion = "${version['MVN']}-${version['TIMESTAMP']}_${version['COMMIT']}"
-
+    echo "Automated version: ${newVersion}"
 
   }
 
