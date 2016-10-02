@@ -67,7 +67,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
-                <version>LATEST</version>
+                <version>3.0.4</version>
                 <configuration>
                     <!--
                                 Enables analysis which takes more memory but finds more bugs.
