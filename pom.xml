@@ -23,9 +23,14 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>VERSION</version>
+        </dependency>
+        <!--<dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
@@ -79,7 +84,8 @@
                     <threshold>Low</threshold>
                     <!-- Produces XML report -->
                     <xmlOutput>true</xmlOutput>
-                    <failOnError>false</failOnError> <!-- TODO: remove-->
+                    <failOnError>false</failOnError>
+                    <!-- TODO: remove-->
                     <!-- Configures the directory in which the XML report is created -->
                     <findbugsXmlOutputDirectory>${project.build.directory}/findbugs</findbugsXmlOutputDirectory>
                 </configuration>

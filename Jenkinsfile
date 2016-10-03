@@ -34,7 +34,9 @@ def mvnHome = tool 'M3'
 
     stash includes: 'manifest.yml, target/pong-matcher-spring-*.jar', name: 'artifacts'
   }
+}
 
+node {
   stage ('Acceptance') {
   unstash name: 'artifacts'
     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '3cd9dd1f-8015-4bc1-9e2b-329c6fa267de', passwordVariable: 'CF_PASSWORD', usernameVariable: 'CF_USERNAME']]) {
@@ -45,6 +47,17 @@ def mvnHome = tool 'M3'
         set -e
         cf push -n cf-demo-andrena-test
       '''
+    }
+
+    // This step should not normally be used in your script. Consult the inline help for details.
+//withDockerContainer(args: '-e "HOST=cf-demo-andrena-test.aws.ie.a9sapp.eu"', image: 'docker.gocd.cf-app.com:5000/pong-matcher-acceptance') {
+    // some block
+//}
+
+
+    docker.image('docker.gocd.cf-app.com:5000/pong-matcher-acceptance').inside('-e "HOST=cf-demo-andrena-test.aws.ie.a9sapp.eu"', image: 'docker.gocd.cf-app.com:5000/pong-matcher-acceptance') {
+      //git url: 'https://github.com/cloudfoundry-samples/pong_matcher_acceptance.git'
+      //sh 'mvn -B clean install'
     }
   }
 
