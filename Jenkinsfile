@@ -36,9 +36,14 @@ def mvnHome = tool 'M3'
   }
 
   stage ('Acceptance') {
+  unstash name: 'artifacts'
     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '3cd9dd1f-8015-4bc1-9e2b-329c6fa267de', passwordVariable: 'CF_PASSWORD', usernameVariable: 'CF_USERNAME']]) {
       sh '''
         cf login -a https://api.aws.ie.a9s.eu -o thomas_rauner_andrena_de -s test -u $CF_USERNAME -p $CF_PASSWORD
+        set +e
+        cf create-service a9s-postgresql postgresql-single-small mysql
+        set -e
+        cf push -n cf-demo-andrena-test
       '''
     }
   }
