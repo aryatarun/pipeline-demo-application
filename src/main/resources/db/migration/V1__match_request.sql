@@ -1,5 +1,5 @@
 CREATE TABLE match_request (
-  id           BIGINT PRIMARY KEY AUTO_INCREMENT,
+  id           BIGSERIAL PRIMARY KEY,
   uuid         VARCHAR(255) NOT NULL,
   requester_id VARCHAR(255) NOT NULL,
 
