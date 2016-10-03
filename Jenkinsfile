@@ -32,6 +32,15 @@ def mvnHome = tool 'M3'
 
     step([$class: 'AnalysisPublisher', canComputeNew: false, defaultEncoding: '', healthy: '', unHealthy: ''])
 
+    stash includes: 'manifest.yml, target/pong-matcher-spring-*.jar', name: 'artifacts'
+  }
+
+  stage ('Acceptance') {
+    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '3cd9dd1f-8015-4bc1-9e2b-329c6fa267de', passwordVariable: 'CF_PASSWORD', usernameVariable: 'CF_USERNAME']]) {
+      sh '''
+        cf login -a https://api.aws.ie.a9s.eu -o thomas_rauner_andrena_de -s test -u $CF_USERNAME -p $CF_PASSWORD
+      '''
+    }
   }
 
   //Acceptance test (maybe cf?)
