@@ -1,3 +1,5 @@
+def version = ""
+
 node {
 
 def mvnHome = tool 'M3'
@@ -11,13 +13,13 @@ def mvnHome = tool 'M3'
       echo "COMMIT=`git rev-parse --short HEAD`" >> version.properties
       echo "TIMESTAMP=`date +\"%Y%M%d_%H%M%S\"`" >> version.properties
     """
-    def version = readProperties file: 'version.properties'
-    echo "Pom-Version=$version"
+    def pomVersion = readProperties file: 'version.properties'
+    echo "Pom-Version=$pomVersion"
 
-    def newVersion = "${version['MVN']}-${version['TIMESTAMP']}_${version['COMMIT']}"
-    echo "Automated version: ${newVersion}"
+    version = "${pomVersion['MVN']}-${pomVersion['TIMESTAMP']}_${pomVersion['COMMIT']}"
+    echo "Automated version: ${version}"
 
-    sh "${mvnHome}/bin/mvn versions:set -DnewVersion=\"${newVersion}\""
+    sh "${mvnHome}/bin/mvn versions:set -DnewVersion=\"${version}\""
 
     //Should push the version back to repo
   }
@@ -45,7 +47,7 @@ node {
         set +e
         cf create-service a9s-postgresql postgresql-single-small mysql
         set -e
-        cf push -n cf-demo-andrena-test -p \"target/pong-matcher-spring-${newVersion}.jar\"
+        cf push -n cf-demo-andrena-test -p \"target/pong-matcher-spring-${version}.jar\"
       """
     }
 
