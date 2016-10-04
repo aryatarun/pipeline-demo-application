@@ -47,7 +47,7 @@ node {
         set +e
         cf create-service a9s-postgresql postgresql-single-small mysql
         set -e
-        cf push -n cf-demo-andrena-test -p \"target/pong-matcher-spring-${version}.jar\"
+        cf push -n cf-demo-andrena-test -p \"target/pong-matcher-spring-${version}.jar\" -t 300
       """
     }
 
