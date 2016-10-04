@@ -34,7 +34,7 @@ def mvnHome = tool 'M3'
 
     step([$class: 'AnalysisPublisher', canComputeNew: false, defaultEncoding: '', healthy: '', unHealthy: ''])
 
-    stash includes: 'manifest.yml, target/pong-matcher-spring-*.jar', name: 'artifacts'
+    stash includes: "manifest.yml, target/pong-matcher-spring-${version}.jar", name: 'artifacts'
   }
 }
 
