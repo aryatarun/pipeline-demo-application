@@ -1,3 +1,23 @@
+<<<<<<< HEAD
+# Continuous Delivery with Jenkins Pipeline
+* Explain a bit about Jenkins Pipeline
+* Fork the Repository of the application (https://github.com/cloudfoundry-samples/pong_matcher_spring.git)
+* Add a Jenkinsfile
+* Maven build
+
+## Order Jenkinsfile
+* echo
+* stage
+* node
+* Commit-Stage git / maven
+
+
+## Links
+
+### Continuous Delivery
+### Jenkins Pipeline
+* [https://github.com/jenkinsci/pipeline-plugin/blob/master/TUTORIAL.md](Jenkins Pipeline Tutorial)
+=======
 # CF example app: ping-pong matching server
 
 This is an app to match ping-pong players with each other. It's currently an
@@ -86,3 +106,4 @@ Now follow the [interaction instructions][interaction].
 [acceptance-test]:https://github.com/cloudfoundry-samples/pong_matcher_acceptance
 [pws]:https://run.pivotal.io
 [interaction]:https://github.com/cloudfoundry-samples/pong_matcher_rails/blob/master/README.md#interaction-instructions
+>>>>>>> 97fe83f9b28950a5e1b077f938a578fd814dc644
