@@ -66,6 +66,7 @@ node {
 
     sh '''
       set -e
+      set -x
       ./run_tests.sh
     '''
 
