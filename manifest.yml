@@ -3,5 +3,7 @@ applications:
   - name: springpong
     buildpack: java_buildpack
     path: target/pong-matcher-spring.jar
+    timeout: 180
+    memory: 1024M
     services:
       - mysql

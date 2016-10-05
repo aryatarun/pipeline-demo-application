@@ -99,6 +99,7 @@ node {
         domain=aws.ie.a9sapp.eu
         mainroute=cf-demo-andrena-prod
         cf push $appname -n $approute -p \"target/pong-matcher-spring-${version}.jar\" -t 180 -b https://github.com/cloudfoundry/java-buildpack.git
+        ping -c 4 $approute.$domain
         cf map-route $appname $domain -n $mainroute
         for boundapp in $bound_apps; do
           cf unmap-route $boundapp $domain -n $mainroute
