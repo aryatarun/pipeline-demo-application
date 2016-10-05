@@ -56,7 +56,7 @@ node {
     // some block
 //}
 
-    def testHost = "htcf-demo-andrena-test
+    def testHost = "cf-demo-andrena-test"
 
     sh "docker run --rm -i -t -e "HOST=$HOST" docker.gocd.cf-app.com:5000/pong-matcher-acceptance"
     docker.image('docker.gocd.cf-app.com:5000/pong-matcher-acceptance').inside('-e "HOST=cf-demo-andrena-test.aws.ie.a9sapp.eu"', image: 'docker.gocd.cf-app.com:5000/pong-matcher-acceptance') {
