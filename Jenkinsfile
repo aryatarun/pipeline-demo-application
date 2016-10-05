@@ -88,8 +88,8 @@ node {
         cf create-service a9s-postgresql postgresql-single-small mysql
         set -e
 
-        route=${cf curl /v2/routes?q=host:cf-demo-andrena-prod | jq -r ".resources[].metadata.url"}
-        bound_apps=${cf curl ${route}/apps | jq -r ".resources[].entity.name"}
+        route=\$(cf curl /v2/routes?q=host:cf-demo-andrena-prod | jq -r ".resources[].metadata.url")
+        bound_apps=\$(cf curl \$route/apps | jq -r ".resources[].entity.name")
         for bound_app in $bound_apps; do
           echo "Bound App: $bound_app"
         done
