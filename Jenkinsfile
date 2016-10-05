@@ -38,8 +38,10 @@ def mvnHome = tool 'M3'
   }
 }
 
-node {
+
+
   stage ('Acceptance') {
+node {
   unstash name: 'artifacts'
     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '3cd9dd1f-8015-4bc1-9e2b-329c6fa267de', passwordVariable: 'CF_PASSWORD', usernameVariable: 'CF_USERNAME']]) {
       sh """
@@ -56,9 +58,17 @@ node {
     // some block
 //}
 
+}
+node {
     def testHost = "cf-demo-andrena-test.aws.ie.a9sapp.eu"
 
-    sh "docker run --rm -i -t -e \"HOST=${testHost}\" docker.gocd.cf-app.com:5000/pong-matcher-acceptance"
+    git url: 'git@bitbucket.org:thomasanderer/pongmatcher-acceptance-fixed.git'
+
+    sh '''#!/bin/bash -e -x
+    ./run_tests.sh
+    '''
+
+    //sh "docker run --rm -i -t -e \"HOST=${testHost}\" docker.gocd.cf-app.com:5000/pong-matcher-acceptance"
     //docker.image('docker.gocd.cf-app.com:5000/pong-matcher-acceptance').inside('-e "HOST=cf-demo-andrena-test.aws.ie.a9sapp.eu"', image: 'docker.gocd.cf-app.com:5000/pong-matcher-acceptance') {
       //git url: 'https://github.com/cloudfoundry-samples/pong_matcher_acceptance.git'
       //sh 'mvn -B clean install'
