@@ -9,6 +9,12 @@
 * stage
 * node
 * Commit-Stage git / maven
+* versioning (methods?)
+* junit / findbugs
+* deploy to test (methods?)
+* acceptance-test with docker
+* parallel manual step
+* b/g deployment (external file? load?)
 
 
 ## Links
