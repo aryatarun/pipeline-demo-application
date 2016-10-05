@@ -64,7 +64,8 @@ node {
 
     git url: 'git@bitbucket.org:thomasanderer/pongmatcher-acceptance-fixed.git'
 
-    sh '''#!/bin/bash -e -x
+    sh '''
+      set -e
       ./run_tests.sh
     '''
 
