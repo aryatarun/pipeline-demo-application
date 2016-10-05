@@ -56,9 +56,9 @@ node {
     // some block
 //}
 
-    def testHost = "cf-demo-andrena-test"
+    def testHost = "cf-demo-andrena-test.aws.ie.a9sapp.eu"
 
-    sh "docker run --rm -i -t -e "HOST=$HOST" docker.gocd.cf-app.com:5000/pong-matcher-acceptance"
+    sh "docker run --rm -i -t -e \"HOST=${testHost}\" docker.gocd.cf-app.com:5000/pong-matcher-acceptance"
     docker.image('docker.gocd.cf-app.com:5000/pong-matcher-acceptance').inside('-e "HOST=cf-demo-andrena-test.aws.ie.a9sapp.eu"', image: 'docker.gocd.cf-app.com:5000/pong-matcher-acceptance') {
       //git url: 'https://github.com/cloudfoundry-samples/pong_matcher_acceptance.git'
       //sh 'mvn -B clean install'
