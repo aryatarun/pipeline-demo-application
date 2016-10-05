@@ -65,7 +65,7 @@ node {
     git url: 'git@bitbucket.org:thomasanderer/pongmatcher-acceptance-fixed.git'
 
     sh '''#!/bin/bash -e -x
-    ./run_tests.sh
+      ./run_tests.sh
     '''
 
     //sh "docker run --rm -i -t -e \"HOST=${testHost}\" docker.gocd.cf-app.com:5000/pong-matcher-acceptance"
