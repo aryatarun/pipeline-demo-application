@@ -8,7 +8,7 @@ import javax.persistence.Id;
 @Table(name = "`match_request`")
 public final class MatchRequest {
 
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private volatile Long id;
 
