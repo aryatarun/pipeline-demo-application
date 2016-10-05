@@ -5,6 +5,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity
+@Table(name = "`match_request`")
 public final class MatchRequest {
 
     @GeneratedValue

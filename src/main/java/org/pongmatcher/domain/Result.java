@@ -7,6 +7,7 @@ import javax.persistence.Id;
 import java.util.UUID;
 
 @Entity
+@Table(name = "`result`")
 public final class Result {
 
     @Id
