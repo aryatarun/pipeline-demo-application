@@ -80,7 +80,7 @@ node {
   //cf curl /v2/routes/09644b29-b348-4629-9c92-d3820f2633be/apps | jq -r ".resources[].entity.name"
 
     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '3cd9dd1f-8015-4bc1-9e2b-329c6fa267de', passwordVariable: 'CF_PASSWORD', usernameVariable: 'CF_USERNAME']]) {
-      sh """
+      sh """#!/bin/bash -e -x
         mkdir -p cf_home
         export CF_HOME=`pwd`/cf_home
         cf login -a https://api.aws.ie.a9s.eu -o thomas_rauner_andrena_de -s production -u $CF_USERNAME -p $CF_PASSWORD
@@ -88,14 +88,24 @@ node {
         cf create-service a9s-postgresql postgresql-single-small mysql
         set -e
 
-        route=$(cf curl /v2/routes?q=host:cf-demo-andrena-test | jq -r ".resources[].metadata.url")
-        bound_apps=$(cf curl $route/apps | jq -r ".resources[].entity.name")
+        route=${cf curl /v2/routes?q=host:cf-demo-andrena-prod | jq -r ".resources[].metadata.url"}
+        bound_apps=${cf curl $route/apps | jq -r ".resources[].entity.name"}
         for bound_app in $bound_apps; do
           echo "Bound App: $bound_app"
         done
 
-
-        #cf push cf-demo-andrena-blue -n cf-demo-andrena-blue -p \"target/pong-matcher-spring-${version}.jar\" -t 180 -b https://github.com/cloudfoundry/java-buildpack.git
+        appname=cf-demo-andrena-prod-${version}
+        approute=cf-demo-andrena-prod-${version}
+        domain=aws.ie.a9sapp.eu
+        mainroute=cf-demo-andrena-prod
+        cf push $appname -n $approute -p \"target/pong-matcher-spring-${version}.jar\" -t 180 -b https://github.com/cloudfoundry/java-buildpack.git
+        cf map-route $appname $domain -n $mainroute
+        for boundapp in $bound_apps; do
+          cf unmap-route $boundapp $domain -n $mainroute
+          cf scale -i 0 $boundapp
+          cf stop $boundapp
+          cf delete $boundapp
+        done
       """
     }
 
