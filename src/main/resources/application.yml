@@ -1,8 +1,8 @@
 ---
 spring:
   datasource:
-    driverClassName: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost/pong_matcher_spring_development
+    driverClassName: org.postgresql.Driver
+    #url: jdbc:mysql://localhost/pong_matcher_spring_development
     username: springpong
     password: springpong
   jpa:

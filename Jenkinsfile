@@ -56,7 +56,9 @@ node {
     // some block
 //}
 
+    def testHost = "htcf-demo-andrena-test
 
+    sh "docker run --rm -i -t -e "HOST=$HOST" docker.gocd.cf-app.com:5000/pong-matcher-acceptance"
     docker.image('docker.gocd.cf-app.com:5000/pong-matcher-acceptance').inside('-e "HOST=cf-demo-andrena-test.aws.ie.a9sapp.eu"', image: 'docker.gocd.cf-app.com:5000/pong-matcher-acceptance') {
       //git url: 'https://github.com/cloudfoundry-samples/pong_matcher_acceptance.git'
       //sh 'mvn -B clean install'
@@ -66,5 +68,25 @@ node {
   //Acceptance test (maybe cf?)
   //Parallel performance test (maybe curl?)
   //Manual step -> manual acceptance
+  //release to production (cf b/g?)
+}
+
+
+
+node {
+  stage ('Production') {
+  unstash name: 'artifacts'
+    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '3cd9dd1f-8015-4bc1-9e2b-329c6fa267de', passwordVariable: 'CF_PASSWORD', usernameVariable: 'CF_USERNAME']]) {
+      sh """
+        cf login -a https://api.aws.ie.a9s.eu -o thomas_rauner_andrena_de -s production -u $CF_USERNAME -p $CF_PASSWORD
+        set +e
+        cf create-service a9s-postgresql postgresql-single-small mysql
+        set -e
+        cf push cf-demo-andrena-blue -n cf-demo-andrena-blue -p \"target/pong-matcher-spring-${version}.jar\" -t 180 -b https://github.com/cloudfoundry/java-buildpack.git
+      """
+    }
+
+  }
+
   //release to production (cf b/g?)
 }
