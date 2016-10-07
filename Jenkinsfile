@@ -1,7 +1,7 @@
 def version = ""
 
 
-private void versioning(mvnHome, version) {
+private void versioning(mvnHome) {
     stage('Versioning') {
 
         sh """
@@ -12,12 +12,13 @@ private void versioning(mvnHome, version) {
         def pomVersion = readProperties file: 'version.properties'
         echo "Pom-Version=$pomVersion"
 
-        version = "${pomVersion['MVN']}-${pomVersion['TIMESTAMP']}_${pomVersion['COMMIT']}"
+        def version = "${pomVersion['MVN']}-${pomVersion['TIMESTAMP']}_${pomVersion['COMMIT']}"
         echo "Automated version: ${version}"
 
         sh "${mvnHome}/bin/mvn versions:set -DnewVersion=\"${version}\""
 
         //Should push the version back to repo
+        return version
     }
 }
 
@@ -34,7 +35,7 @@ stage('Commit-Stage') {
     node {
         def mvnHome = tool 'M3'
         git url: 'git@bitbucket.org:thomasanderer/pipeline-demo.git'
-        versioning(mvnHome, version)
+        version = versioning(mvnHome)
         executeCiBuild(mvnHome, version)
     }
 }
