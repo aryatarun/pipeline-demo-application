@@ -129,7 +129,7 @@ node {
                 curl -c 4 $approute.$domain
                 success=$?
                 set -e
-                if [ "$$success" -eq 0 ]; then
+                if [ "$success" -eq 0 ]; then
                     echo "Removing other apps"
                     cf map-route $appname $domain -n $mainroute
                     for boundapp in $bound_apps; do
