@@ -60,12 +60,15 @@ stage('Acceptance') {
         git url: 'git@bitbucket.org:thomasanderer/pongmatcher-acceptance-fixed.git'
 
         sh """#/bin/bash -ex
-      docker build -t pong-matcher-acceptance .
-      docker run --name acceptance --rm -e \"HOST=$testHost\" pong-matcher-acceptance
-    """
-    }
-    }, manual: {
-        input("Successfully tested?")
+            docker build -t pong-matcher-acceptance .
+            docker run --name acceptance --rm -e \"HOST=$testHost\" pong-matcher-acceptance
+        """
+        }
+    }, performance: {
+        node {
+            input("Successfully tested?")
+        }
+
     }
 
     //Acceptance test (maybe cf?)
@@ -84,33 +87,33 @@ node {
 
         withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '3cd9dd1f-8015-4bc1-9e2b-329c6fa267de', passwordVariable: 'CF_PASSWORD', usernameVariable: 'CF_USERNAME']]) {
             sh """#!/bin/bash -e -x
-        mkdir -p cf_home
-        export CF_HOME=`pwd`/cf_home
-        cf login -a https://api.aws.ie.a9s.eu -o thomas_rauner_andrena_de -s production -u $CF_USERNAME -p $CF_PASSWORD
-        set +e
-        cf create-service a9s-postgresql postgresql-single-small mysql
-        set -e
+                mkdir -p cf_home
+                export CF_HOME=`pwd`/cf_home
+                cf login -a https://api.aws.ie.a9s.eu -o thomas_rauner_andrena_de -s production -u $CF_USERNAME -p $CF_PASSWORD
+                set +e
+                cf create-service a9s-postgresql postgresql-single-small mysql
+                set -e
 
-        route=\$(cf curl /v2/routes?q=host:cf-demo-andrena-prod | jq -r ".resources[].metadata.url")
-        bound_apps=\$(cf curl \$route/apps | jq -r ".resources[].entity.name")
-        for bound_app in $bound_apps; do
-          echo "Bound App: $bound_app"
-        done
+                route=\$(cf curl /v2/routes?q=host:cf-demo-andrena-prod | jq -r ".resources[].metadata.url")
+                bound_apps=\$(cf curl \$route/apps | jq -r ".resources[].entity.name")
+                for bound_app in $bound_apps; do
+                  echo "Bound App: $bound_app"
+                done
 
-        appname=cf-demo-andrena-prod-${version}
-        approute=cf-demo-andrena-prod-${version}
-        domain=aws.ie.a9sapp.eu
-        mainroute=cf-demo-andrena-prod
-        cf push $appname -n $approute -p \"target/pong-matcher-spring-${version}.jar\" -t 180 -b https://github.com/cloudfoundry/java-buildpack.git
-        ping -c 4 $approute.$domain
-        cf map-route $appname $domain -n $mainroute
-        for boundapp in $bound_apps; do
-          cf unmap-route $boundapp $domain -n $mainroute
-          cf scale -i 0 $boundapp
-          cf stop $boundapp
-          cf delete $boundapp
-        done
-      """
+                appname=cf-demo-andrena-prod-${version}
+                approute=cf-demo-andrena-prod-${version}
+                domain=aws.ie.a9sapp.eu
+                mainroute=cf-demo-andrena-prod
+                cf push $appname -n $approute -p \"target/pong-matcher-spring-${version}.jar\" -t 180 -b https://github.com/cloudfoundry/java-buildpack.git
+                ping -c 4 $approute.$domain
+                cf map-route $appname $domain -n $mainroute
+                for boundapp in $bound_apps; do
+                  cf unmap-route $boundapp $domain -n $mainroute
+                  cf scale -i 0 $boundapp
+                  cf stop $boundapp
+                  cf delete $boundapp
+                done
+              """
         }
 
     }
