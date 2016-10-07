@@ -114,7 +114,7 @@ node {
                 if [ -z "$route" ]; then
                   bound_apps=
                 else
-                  bound_apps=\\$(cf curl \\$route/apps | jq -r ".resources[].entity.name")
+                  bound_apps=\$(cf curl \$route/apps | jq -r ".resources[].entity.name")
                 fi
                 for bound_app in $bound_apps; do
                   echo "Bound App: $bound_app"
