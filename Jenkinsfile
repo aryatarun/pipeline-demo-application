@@ -112,9 +112,9 @@ node {
 
                 route=\$(cf curl /v2/routes?q=host:cf-demo-andrena-prod | jq -r ".resources[].metadata.url")
                 if [ -z "$route" ]; then
-                  bound_apps=\$(cf curl \$route/apps | jq -r ".resources[].entity.name")
-                else
                   bound_apps=
+                else
+                  bound_apps=\\$(cf curl \\$route/apps | jq -r ".resources[].entity.name")
                 fi
                 for bound_app in $bound_apps; do
                   echo "Bound App: $bound_app"
