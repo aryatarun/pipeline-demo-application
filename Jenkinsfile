@@ -74,12 +74,12 @@ stage('Acceptance') {
 
     }
 
-    input("Manual acceptance tests successfully?")
+}
 
-    //Acceptance test (maybe cf?)
-    //Parallel performance test (maybe curl?)
-    //Manual step -> manual acceptance
-    //release to production (cf b/g?)
+stage('Manual acceptance') {
+    node {
+        input("Manual acceptance tests successfully?")
+    }
 }
 
 
