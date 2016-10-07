@@ -30,14 +30,12 @@ private void executeCiBuild(mvnHome, version) {
     }
 }
 
-stage('Commit-Stage') {
     node {
 
         git url: 'git@bitbucket.org:thomasanderer/pipeline-demo.git'
         versioning(mvnHome, version)
         executeCiBuild(mvnHome, version)
     }
-}
 
 
 
