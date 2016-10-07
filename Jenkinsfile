@@ -60,15 +60,14 @@ node {
 
 }
 node {
-    def testHost = "cf-demo-andrena-test.aws.ie.a9sapp.eu"
+    def testHost = "http://cf-demo-andrena-test.aws.ie.a9sapp.eu"
 
     git url: 'git@bitbucket.org:thomasanderer/pongmatcher-acceptance-fixed.git'
 
-    sh '''
-      set -e
-      set -x
-      ./run_tests.sh
-    '''
+    sh """#/bin/bash -ex
+      docker build -t pong-matcher-acceptance .
+      docker run --name acceptance --rm -e \"HOST=$testHost\" pong-matcher-acceptance
+    """
 
     //sh "docker run --rm -i -t -e \"HOST=${testHost}\" docker.gocd.cf-app.com:5000/pong-matcher-acceptance"
     //docker.image('docker.gocd.cf-app.com:5000/pong-matcher-acceptance').inside('-e "HOST=cf-demo-andrena-test.aws.ie.a9sapp.eu"', image: 'docker.gocd.cf-app.com:5000/pong-matcher-acceptance') {
