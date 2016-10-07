@@ -142,6 +142,7 @@ node {
                     echo "Reverting"
                     cf stop $appname
                     cf delete $appname
+                    exit 1
                 fi
               '''
             }
