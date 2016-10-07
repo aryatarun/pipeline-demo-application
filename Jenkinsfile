@@ -77,7 +77,7 @@ node {
 }
 
 
-/*
+
 stage('Acceptance') {
     deployToCf(version)
 
@@ -85,11 +85,9 @@ stage('Acceptance') {
         runAcceptanceTest()
     }, manual: {
         manualAcceptanceCheck()
-
     }
-
 }
-*/
+
 
 
 
@@ -97,12 +95,14 @@ stage('Acceptance') {
 node {
     stage('Production') {
         unstash name: 'artifacts'
-        //cf curl /v2/routes?q=host:cf-demo-andrena-test | jq -r ".resources[].metadata.url"
-        //cf curl /v2/routes/09644b29-b348-4629-9c92-d3820f2633be/apps | jq -r ".resources[].entity.name"
+        zeroDowntimeDeploy(version)
+    }
+}
 
-        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '3cd9dd1f-8015-4bc1-9e2b-329c6fa267de', passwordVariable: 'CF_PASSWORD', usernameVariable: 'CF_USERNAME']]) {
-            withEnv(["VERSION=$version"]) {
-                sh '''#!/bin/bash -ex
+private void zeroDowntimeDeploy(version) {
+    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '3cd9dd1f-8015-4bc1-9e2b-329c6fa267de', passwordVariable: 'CF_PASSWORD', usernameVariable: 'CF_USERNAME']]) {
+        withEnv(["VERSION=$version"]) {
+            sh '''#!/bin/bash -ex
                 mkdir -p cf_home
                 export CF_HOME=`pwd`/cf_home
                 cf login -a https://api.aws.ie.a9s.eu -o thomas_rauner_andrena_de -s production -u $CF_USERNAME -p $CF_PASSWORD
@@ -145,12 +145,8 @@ node {
                     exit 1
                 fi
               '''
-            }
-
-
         }
 
-    }
 
-    //release to production (cf b/g?)
+    }
 }
