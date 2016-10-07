@@ -6,7 +6,7 @@ method(name: 'build', type: 'Object', params: [job:'java.lang.String'], doc: 'Bu
 method(name: 'build', type: 'Object', namedParams: [parameter(name: 'job', type: 'java.lang.String'), parameter(name: 'parameters', type: 'Map'), parameter(name: 'propagate', type: 'boolean'), parameter(name: 'quietPeriod', type: 'java.lang.Integer'), parameter(name: 'wait', type: 'boolean'), ], doc: 'Build a job')
 method(name: 'echo', type: 'Object', params: [message:'java.lang.String'], doc: 'Print Message')
 method(name: 'emailextrecipients', type: 'Object', params: [recipientProviders:'Map'], doc: 'Extended Email Recipients')
-method(name: 'envVarsForTool', type: 'Object', namedParams: [parameter(name: 'toolId', type: 'java.lang.String'), parameter(name: 'toolVersion', type: 'java.lang.String'), ], doc: 'Fetches the environment variables for a given tool in a list of 'FOO=bar' strings suitable for the withEnv step.')
+method(name: 'envVarsForTool', type: 'Object', namedParams: [parameter(name: 'toolId', type: 'java.lang.String'), parameter(name: 'toolVersion', type: 'java.lang.String'), ], doc: 'Fetches the environment variables for a given tool in a list of \'FOO=bar\' strings suitable for the withEnv step.')
 method(name: 'error', type: 'Object', params: [message:'java.lang.String'], doc: 'Error signal')
 method(name: 'input', type: 'Object', params: [message:'java.lang.String'], doc: 'Wait for interactive input')
 method(name: 'input', type: 'Object', namedParams: [parameter(name: 'message', type: 'java.lang.String'), parameter(name: 'id', type: 'java.lang.String'), parameter(name: 'ok', type: 'java.lang.String'), parameter(name: 'parameters', type: 'Map'), parameter(name: 'submitter', type: 'java.lang.String'), ], doc: 'Wait for interactive input')
