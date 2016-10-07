@@ -1,4 +1,4 @@
-def version = ""
+
 
 
 private void versioning(mvnHome) {
@@ -31,19 +31,8 @@ private void executeCiBuild(mvnHome, version) {
     }
 }
 
-stage('Commit-Stage') {
-    node {
-        def mvnHome = tool 'M3'
-        git url: 'git@bitbucket.org:thomasanderer/pipeline-demo.git'
-        version = versioning(mvnHome)
-        executeCiBuild(mvnHome, version)
-    }
-}
 
-
-
-
-stage('Acceptance') {
+private void deployToCf(version) {
     node {
         unstash name: 'artifacts'
         withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '3cd9dd1f-8015-4bc1-9e2b-329c6fa267de', passwordVariable: 'CF_PASSWORD', usernameVariable: 'CF_USERNAME']]) {
@@ -56,7 +45,17 @@ stage('Acceptance') {
       """
         }
     }
-    parallel automated: {
+}
+
+
+private void runPerformanceTest() {
+    node {
+        echo "Doing some performance stuff"
+        sleep 4
+    }
+}
+
+private void runAcceptanceTest() {
     node {
         def testHost = "http://cf-demo-andrena-test.aws.ie.a9sapp.eu"
 
@@ -66,22 +65,42 @@ stage('Acceptance') {
             docker build -t pong-matcher-acceptance .
             docker run --name acceptance --rm -e \"HOST=$testHost\" pong-matcher-acceptance
         """
-        }
+    }
+}
+
+def version = ""
+
+node {
+    def mvnHome = tool 'M3'
+    git url: 'git@bitbucket.org:thomasanderer/pipeline-demo.git'
+    version = versioning(mvnHome)
+    executeCiBuild(mvnHome, version)
+}
+
+private void manualAcceptanceCheck() {
+    node {
+        input("Manual acceptance tests successfully?")
+    }
+}
+
+/*
+stage('Acceptance') {
+    deployToCf(version)
+
+    parallel automated: {
+        runAcceptanceTest()
     }, performance: {
-        node {
-            echo "Doing some performance stuff"
-            sleep 4
-        }
+        runPerformanceTest()
 
     }
 
 }
 
 stage('Manual acceptance') {
-    node {
-        input("Manual acceptance tests successfully?")
-    }
+    manualAcceptanceCheck()
 }
+*/
+
 
 
 
@@ -92,7 +111,8 @@ node {
         //cf curl /v2/routes/09644b29-b348-4629-9c92-d3820f2633be/apps | jq -r ".resources[].entity.name"
 
         withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '3cd9dd1f-8015-4bc1-9e2b-329c6fa267de', passwordVariable: 'CF_PASSWORD', usernameVariable: 'CF_USERNAME']]) {
-            sh """#!/bin/bash -e -x
+            withEnv(["VERSION=$version"]) {
+                sh """#!/bin/bash -e -x
                 mkdir -p cf_home
                 export CF_HOME=`pwd`/cf_home
                 cf login -a https://api.aws.ie.a9s.eu -o thomas_rauner_andrena_de -s production -u $CF_USERNAME -p $CF_PASSWORD
@@ -106,11 +126,11 @@ node {
                   echo "Bound App: $bound_app"
                 done
 
-                appname=cf-demo-andrena-prod-${version}
-                approute=cf-demo-andrena-prod-${version}
+                appname=cf-demo-andrena-prod-$VERSION
+                approute=cf-demo-andrena-prod-$VERSION
                 domain=aws.ie.a9sapp.eu
                 mainroute=cf-demo-andrena-prod
-                cf push $appname -n $approute -p \"target/pong-matcher-spring-${version}.jar\" -t 180 -b https://github.com/cloudfoundry/java-buildpack.git
+                cf push $appname -n $approute -p \"target/pong-matcher-spring-$VERSION.jar\" -t 180 -b https://github.com/cloudfoundry/java-buildpack.git
                 ping -c 4 $approute.$domain
                 cf map-route $appname $domain -n $mainroute
                 for boundapp in $bound_apps; do
@@ -120,6 +140,9 @@ node {
                   cf delete $boundapp
                 done
               """
+            }
+
+
         }
 
     }
