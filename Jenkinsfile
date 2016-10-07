@@ -129,8 +129,9 @@ node {
                 curl -c 4 $approute.$domain
                 success=$?
                 set -e
-                if success; then
-                cf map-route $appname $domain -n $mainroute
+                if $success; then
+                    echo "Removing other apps"
+                    cf map-route $appname $domain -n $mainroute
                     for boundapp in $bound_apps; do
                       cf unmap-route $boundapp $domain -n $mainroute
                       cf scale -i 0 $boundapp
@@ -138,8 +139,9 @@ node {
                       cf delete $boundapp
                     done
                 else
-                    cf stop appname
-                    cf delete appname
+                    echo "Reverting"
+                    cf stop $appname
+                    cf delete $appname
                 fi
               '''
             }
