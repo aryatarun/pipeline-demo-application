@@ -1,18 +1,14 @@
 def version = ""
+def mvnHome = tool 'M3'
 
-node {
-
-    def mvnHome = tool 'M3'
-
-    git url: 'git@bitbucket.org:thomasanderer/pipeline-demo.git'
-
+private void versioning(mvnHome, version) {
     stage('Versioning') {
 
         sh """
-      echo "MVN=`${mvnHome}/bin/mvn -q -Dexec.executable="echo" -Dexec.args='\${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.3.1:exec`" > version.properties
-      echo "COMMIT=`git rev-parse --short HEAD`" >> version.properties
-      echo "TIMESTAMP=`date +\"%Y%M%d_%H%M%S\"`" >> version.properties
-    """
+            echo "MVN=`${mvnHome}/bin/mvn -q -Dexec.executable="echo" -Dexec.args='\${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.3.1:exec`" > version.properties
+            echo "COMMIT=`git rev-parse --short HEAD`" >> version.properties
+            echo "TIMESTAMP=`date +\"%Y%M%d_%H%M%S\"`" >> version.properties
+        """
         def pomVersion = readProperties file: 'version.properties'
         echo "Pom-Version=$pomVersion"
 
@@ -23,20 +19,26 @@ node {
 
         //Should push the version back to repo
     }
+}
 
+private void executeCiBuild(mvnHome, version) {
     stage('CI-Build') {
-
         sh "${mvnHome}/bin/mvn -B verify"
-
         junit 'target/surefire-reports/**.xml'
-
         step([$class: 'FindBugsPublisher', canComputeNew: false, defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', pattern: '**/findbugs.xml', unHealthy: ''])
-
-        step([$class: 'AnalysisPublisher', canComputeNew: false, defaultEncoding: '', healthy: '', unHealthy: ''])
-
         stash includes: "manifest.yml, target/pong-matcher-spring-${version}.jar", name: 'artifacts'
     }
 }
+
+stage('Commit-Stage') {
+    node {
+
+        git url: 'git@bitbucket.org:thomasanderer/pipeline-demo.git'
+        versioning(mvnHome, version)
+        executeCiBuild(mvnHome, version)
+    }
+}
+
 
 
 
@@ -66,10 +68,13 @@ stage('Acceptance') {
         }
     }, performance: {
         node {
-            input("Successfully tested?")
+            echo "Doing some performance stuff"
+            sleep 4
         }
 
     }
+
+    input("Manual acceptance tests successfully?")
 
     //Acceptance test (maybe cf?)
     //Parallel performance test (maybe curl?)
