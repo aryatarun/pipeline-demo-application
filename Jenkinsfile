@@ -121,7 +121,7 @@ node {
                 done
 
                 appname=cf-demo-andrena-prod-$VERSION
-                approute=cf-demo-andrena-prod-$VERSION
+                approute=cf-demo-andrena-prod-${VERSION//\\./_}
                 domain=aws.ie.a9sapp.eu
                 mainroute=cf-demo-andrena-prod
                 cf push $appname -n $approute -p \"target/pong-matcher-spring-$VERSION.jar\" -t 180 -b https://github.com/cloudfoundry/java-buildpack.git
