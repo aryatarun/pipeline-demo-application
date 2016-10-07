@@ -48,13 +48,6 @@ private void deployToCf(version) {
 }
 
 
-private void runPerformanceTest() {
-    node {
-        echo "Doing some performance stuff"
-        sleep 4
-    }
-}
-
 private void runAcceptanceTest() {
     node {
         def testHost = "http://cf-demo-andrena-test.aws.ie.a9sapp.eu"
@@ -68,6 +61,12 @@ private void runAcceptanceTest() {
     }
 }
 
+private void manualAcceptanceCheck() {
+    node {
+        input("Manual acceptance tests successfully?")
+    }
+}
+
 def version = ""
 
 node {
@@ -77,11 +76,6 @@ node {
     executeCiBuild(mvnHome, version)
 }
 
-private void manualAcceptanceCheck() {
-    node {
-        input("Manual acceptance tests successfully?")
-    }
-}
 
 /*
 stage('Acceptance') {
@@ -89,15 +83,11 @@ stage('Acceptance') {
 
     parallel automated: {
         runAcceptanceTest()
-    }, performance: {
-        runPerformanceTest()
+    }, manual: {
+        manualAcceptanceCheck()
 
     }
 
-}
-
-stage('Manual acceptance') {
-    manualAcceptanceCheck()
 }
 */
 
@@ -112,7 +102,7 @@ node {
 
         withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '3cd9dd1f-8015-4bc1-9e2b-329c6fa267de', passwordVariable: 'CF_PASSWORD', usernameVariable: 'CF_USERNAME']]) {
             withEnv(["VERSION=$version"]) {
-                sh """#!/bin/bash -e -x
+                sh '''#!/bin/bash -e -x
                 mkdir -p cf_home
                 export CF_HOME=`pwd`/cf_home
                 cf login -a https://api.aws.ie.a9s.eu -o thomas_rauner_andrena_de -s production -u $CF_USERNAME -p $CF_PASSWORD
@@ -139,7 +129,7 @@ node {
                   cf stop $boundapp
                   cf delete $boundapp
                 done
-              """
+              '''
             }
 
 
