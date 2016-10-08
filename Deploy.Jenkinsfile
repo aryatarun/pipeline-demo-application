@@ -1,4 +1,5 @@
 private void blueGreenDeploy(appname, version, path, mainroute) {
+    echo "here"
     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '3cd9dd1f-8015-4bc1-9e2b-329c6fa267de', passwordVariable: 'CF_PASSWORD', usernameVariable: 'CF_USERNAME']]) {
         withEnv(["APPNAME=$appname-$version", "PATH=$path", "MAINROUTE=$mainroute"]) {
             sh '''#!/bin/bash -ex
