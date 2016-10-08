@@ -45,3 +45,5 @@ def blueGreenDeploy(appname, version, apppath, mainroute) {
 
     }
 }
+
+return this;
