@@ -13,8 +13,18 @@ private void versioning(mvnHome) {
 
     sh "${mvnHome}/bin/mvn versions:set -DnewVersion=\"${version}\""
 
-    //Should push the version back to repo
+    pushPomBuildTag(version)
+
     return version
+}
+
+private void pushPomBuildTag(version) {
+    sh """
+        git add pom.xml
+        git commit -m "versioning $version"
+        git tag BUILD_$version
+        git push origin BUILD_$version
+    """
 }
 
 private void executeCiBuild(mvnHome, version) {
