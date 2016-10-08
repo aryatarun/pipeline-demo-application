@@ -104,8 +104,8 @@ stage('Acceptance') {
 node {
     stage('Production') {
         unstash name: 'artifacts'
-        //deployer = load 'Deploy.Jenkinsfile'
-        blueGreenDeploy("cf-demo-andrena-prod", version, "target/pong-matcher-spring-${version}.jar", "cf-demo-andrena-prod")
+        deployer = load 'Deploy.Jenkinsfile'
+        deployer.blueGreenDeploy("cf-demo-andrena-prod", version, "target/pong-matcher-spring-${version}.jar", "cf-demo-andrena-prod")
         //zeroDowntimeDeploy(version)
     }
 }
@@ -163,9 +163,8 @@ private void zeroDowntimeDeploy(version) {
     }
 }
 */
-
+/*
 def blueGreenDeploy(appname, version, apppath, mainroute) {
-    echo "here"
     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '3cd9dd1f-8015-4bc1-9e2b-329c6fa267de', passwordVariable: 'CF_PASSWORD', usernameVariable: 'CF_USERNAME']]) {
         withEnv(["APPNAME=${appname}-${version}", "APPPATH=${apppath}", "MAINROUTE=${mainroute}"]) {
             sh '''#!/bin/bash -ex
@@ -212,3 +211,4 @@ def blueGreenDeploy(appname, version, apppath, mainroute) {
 
     }
 }
+*/

@@ -1,10 +1,7 @@
-def blueGreenDeploy(appname, version, path, mainroute) {
-    echo "here"
+def blueGreenDeploy(appname, version, apppath, mainroute) {
     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '3cd9dd1f-8015-4bc1-9e2b-329c6fa267de', passwordVariable: 'CF_PASSWORD', usernameVariable: 'CF_USERNAME']]) {
-        withEnv(["APPNAME=$appname-$version", "PATH=$path", "MAINROUTE=$mainroute"]) {
+        withEnv(["APPNAME=${appname}-${version}", "APPPATH=${apppath}", "MAINROUTE=${mainroute}"]) {
             sh '''#!/bin/bash -ex
-                mkdir -p cf_home
-                export CF_HOME=`pwd`/cf_home
                 cf login -a https://api.aws.ie.a9s.eu -o thomas_rauner_andrena_de -s production -u $CF_USERNAME -p $CF_PASSWORD
                 set +e
                 cf create-service a9s-postgresql postgresql-single-small mysql
@@ -22,9 +19,9 @@ def blueGreenDeploy(appname, version, path, mainroute) {
 
                 approute=${APPNAME//\\./_}
                 domain=aws.ie.a9sapp.eu
-                cf push $APPNAME -n $approute -p \"$PATH\"
+                cf push $APPNAME -n $approute -p \"$APPPATH\"
                 set +e
-                curl -c 4 $approute.$domain
+                curl -c 4 ${approute}.${domain}
                 success=$?
                 set -e
                 if [ "$success" -eq "0" ]; then
@@ -48,5 +45,3 @@ def blueGreenDeploy(appname, version, path, mainroute) {
 
     }
 }
-
-return this;
