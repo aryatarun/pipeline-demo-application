@@ -86,7 +86,7 @@ node {
 }
 
 
-
+/*
 stage('Acceptance') {
     deployToCf(version)
 
@@ -96,6 +96,7 @@ stage('Acceptance') {
         manualAcceptanceCheck()
     }
 }
+*/
 
 
 

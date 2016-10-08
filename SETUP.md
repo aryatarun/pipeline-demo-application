@@ -84,6 +84,13 @@ private void pushPomBuildTag(version) {
         git push origin BUILD_$version
     """
 }
+
+private void executeCiBuild(mvnHome, version) {
+    sh "${mvnHome}/bin/mvn -B verify"
+    junit 'target/surefire-reports/**.xml'
+    step([$class: 'FindBugsPublisher', canComputeNew: false, defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', pattern: '**/findbugs.xml', unHealthy: ''])
+    stash includes: "manifest.yml, target/pong-matcher-spring-${version}.jar", name: 'artifacts'
+}
 ```
 
 refactor to
