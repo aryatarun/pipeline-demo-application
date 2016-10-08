@@ -95,7 +95,8 @@ stage('Acceptance') {
 node {
     stage('Production') {
         unstash name: 'artifacts'
-        zeroDowntimeDeploy(version)
+        var blueGreenDeploy = load 'Deploy.Jenkinsfile'
+        blueGreenDeploy.zeroDowntimeDeploy("cf-demo-andrena-prod", version, "target/pong-matcher-spring-$VERSION.jar")
     }
 }
 
