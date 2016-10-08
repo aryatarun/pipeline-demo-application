@@ -112,12 +112,8 @@ node {
 def blueGreenDeploy(appname, version, path, mainroute) {
     echo "here"
     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '3cd9dd1f-8015-4bc1-9e2b-329c6fa267de', passwordVariable: 'CF_PASSWORD', usernameVariable: 'CF_USERNAME']]) {
-        withEnv(["APPNAME=${appname}-${version}", "PATH=$path", "MAINROUTE=${mainroute}"]) {
-            sh '''
-                set -e
-                set -x
-                mkdir -p cf_home
-                export CF_HOME=`pwd`/cf_home
+        withEnv(["APPNAME=${appname}-${version}", "PATH=${path}", "MAINROUTE=${mainroute}"]) {
+            sh '''#!/bin/bash -ex
                 cf login -a https://api.aws.ie.a9s.eu -o thomas_rauner_andrena_de -s production -u $CF_USERNAME -p $CF_PASSWORD
                 set +e
                 cf create-service a9s-postgresql postgresql-single-small mysql
