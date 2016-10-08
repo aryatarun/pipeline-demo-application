@@ -48,3 +48,5 @@ private void blueGreenDeploy(appname, version, path, mainroute) {
 
     }
 }
+
+return this;
