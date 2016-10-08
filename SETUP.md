@@ -16,6 +16,36 @@
 * parallel manual step
 * b/g deployment (external file? load?)
 
+### Intro
+ - Create Jenkins pipeline job
+   Edit pipeline inline
+   ```
+     stage("Stage A") {
+       node {
+         echo "Hello A"
+       }
+     }
+     stage ("Stage B") {
+       node {
+         echo ("Hello B")
+       }
+     }
+         
+   ```
+   
+  - Switch to Jenkinsfile
+  Select git repo ``
+  `Jenkinsfile`
+  Goto IntelliJ
+  Maven job
+  ```
+  
+  ```
+  
+
+
+
+
 
 ## Links
 
