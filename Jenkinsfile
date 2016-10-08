@@ -105,10 +105,64 @@ node {
     stage('Production') {
         unstash name: 'artifacts'
         //deployer = load 'Deploy.Jenkinsfile'
-        blueGreenDeploy("cf-demo-andrena-prod", version, "target/pong-matcher-spring-${version}.jar", "cf-demo-andrena-prod")
+        //blueGreenDeploy("cf-demo-andrena-prod", version, "target/pong-matcher-spring-${version}.jar", "cf-demo-andrena-prod")
+        zeroDowntimeDeploy(version)
     }
 }
 
+private void zeroDowntimeDeploy(version) {
+    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '3cd9dd1f-8015-4bc1-9e2b-329c6fa267de', passwordVariable: 'CF_PASSWORD', usernameVariable: 'CF_USERNAME']]) {
+        withEnv(["VERSION=$version"]) {
+            sh '''#!/bin/bash -ex
+                mkdir -p cf_home
+                export CF_HOME=`pwd`/cf_home
+                cf login -a https://api.aws.ie.a9s.eu -o thomas_rauner_andrena_de -s production -u $CF_USERNAME -p $CF_PASSWORD
+                set +e
+                cf create-service a9s-postgresql postgresql-single-small mysql
+                set -e
+
+                route=\$(cf curl /v2/routes?q=host:cf-demo-andrena-prod | jq -r ".resources[].metadata.url")
+                if [ -z "$route" ]; then
+                  bound_apps=
+                else
+                  bound_apps=\$(cf curl \$route/apps | jq -r ".resources[].entity.name")
+                fi
+                for bound_app in $bound_apps; do
+                  echo "Bound App: $bound_app"
+                done
+
+                appname=cf-demo-andrena-prod-$VERSION
+                approute=cf-demo-andrena-prod-${VERSION//\\./_}
+                domain=aws.ie.a9sapp.eu
+                mainroute=cf-demo-andrena-prod
+                cf push $appname -n $approute -p \"target/pong-matcher-spring-$VERSION.jar\" -t 180 -b https://github.com/cloudfoundry/java-buildpack.git
+                set +e
+                curl -c 4 $approute.$domain
+                success=$?
+                set -e
+                if [ "$success" -eq "0" ]; then
+                    echo "Removing other apps"
+                    cf map-route $appname $domain -n $mainroute
+                    for boundapp in $bound_apps; do
+                      cf unmap-route $boundapp $domain -n $mainroute
+                      cf scale -i 0 $boundapp
+                      cf stop $boundapp
+                      cf delete $boundapp
+                    done
+                else
+                    echo "Reverting"
+                    cf stop $appname
+                    cf delete $appname
+                    exit 1
+                fi
+              '''
+        }
+
+
+    }
+}
+
+/*
 def blueGreenDeploy(appname, version, path, mainroute) {
     echo "here"
     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '3cd9dd1f-8015-4bc1-9e2b-329c6fa267de', passwordVariable: 'CF_PASSWORD', usernameVariable: 'CF_USERNAME']]) {
@@ -133,7 +187,7 @@ def blueGreenDeploy(appname, version, path, mainroute) {
                 domain=aws.ie.a9sapp.eu
                 cf push $APPNAME -n $approute -p \"$PATH\"
                 set +e
-                curl -c 4 $approute.$domain
+                curl -c 4 ${approute}.${domain}
                 success=$?
                 set -e
                 if [ "$success" -eq "0" ]; then
@@ -157,3 +211,4 @@ def blueGreenDeploy(appname, version, path, mainroute) {
 
     }
 }
+*/
