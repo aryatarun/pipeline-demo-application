@@ -104,11 +104,82 @@ node {
 }
 ```
   
+### Acceptance tests - Deploy
+
+```
+stage('Acceptance') {
+    deployToCf(version)
+}
+
+private void deployToCf(version) {
+    node {
+        unstash name: 'artifacts'
+        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '3cd9dd1f-8015-4bc1-9e2b-329c6fa267de', passwordVariable: 'CF_PASSWORD', usernameVariable: 'CF_USERNAME']]) {
+            sh """
+        cf login -a https://api.aws.ie.a9s.eu -o thomas_rauner_andrena_de -s test -u $CF_USERNAME -p $CF_PASSWORD
+        set +e
+        cf create-service a9s-postgresql postgresql-single-small mysql
+        set -e
+        cf push -n cf-demo-andrena-test -p \"target/pong-matcher-spring-${version}.jar\"
+      """
+        }
+    }
+}
+```
 
 
+### Acceptance tests - Run
+
+```
+stage('Acceptance') {
+    deployToCf(version)
+    runAcceptanceTest()
+}
 
 
+private void runAcceptanceTest() {
+    node {
+        def testHost = "http://cf-demo-andrena-test.aws.ie.a9sapp.eu"
 
+        git url: 'git@bitbucket.org:thomasanderer/pongmatcher-acceptance-fixed.git'
+
+        sh """#/bin/bash -ex
+            docker build -t pong-matcher-acceptance .
+            docker run --name acceptance --rm -e \"HOST=$testHost\" pong-matcher-acceptance
+        """
+    }
+}
+```
+
+### Parallel Manual tests
+```
+stage('Acceptance') {
+    deployToCf(version)
+
+    parallel automated: {
+        runAcceptanceTest()
+    }, manual: {
+        manualAcceptanceCheck()
+    }
+}
+
+private void manualAcceptanceCheck() {
+    node {
+        input("Manual acceptance tests successfully?")
+    }
+}
+```
+
+### Blue-Green-Deploy to Production
+```
+node {
+    stage('Production') {
+        unstash name: 'artifacts'
+        deployer = load 'Deploy.Jenkinsfile'
+        blueGreenDeploy("cf-demo-andrena-prod", version, "target/pong-matcher-spring-${version}.jar", "cf-demo-andrena-prod")
+    }
+}
+```
 ## Links
 
 ### Continuous Delivery
