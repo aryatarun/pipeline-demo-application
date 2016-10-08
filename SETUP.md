@@ -52,8 +52,47 @@ Goto IntelliJ
           }
       }
   ```
+  extract method
   
 ### Automatic Versioning
+
+```
+private void versioning(mvnHome) {
+    sh """
+        echo "MVN=`${mvnHome}/bin/mvn -q -Dexec.executable="echo" -Dexec.args='\${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.3.1:exec`" > version.properties
+        echo "COMMIT=`git rev-parse --short HEAD`" >> version.properties
+        echo "TIMESTAMP=`date +\"%Y%M%d_%H%M%S\"`" >> version.properties
+        """
+    def pomVersion = readProperties file: 'version.properties'
+    echo "Pom-Version=$pomVersion"
+
+    def version = "${pomVersion['MVN']}-${pomVersion['TIMESTAMP']}_${pomVersion['COMMIT']}"
+    echo "Automated version: ${version}"
+
+    sh "${mvnHome}/bin/mvn versions:set -DnewVersion=\"${version}\""
+
+    //For reproducability: should push the version back to repo
+    return version
+}
+```
+
+refactor to
+```
+def version = ""
+
+node {
+    def mvnHome = tool 'M3'
+    stage('Checkout') {
+        git url: 'git@bitbucket.org:thomasanderer/pipeline-demo.git'
+    }
+    stage('Versioning') {
+        version = versioning(mvnHome)
+    }
+    stage('CI-Build') {
+        executeCiBuild(mvnHome, version)
+    }
+}
+```
   
 
 
