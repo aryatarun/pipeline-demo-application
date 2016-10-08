@@ -33,14 +33,27 @@
          
    ```
    
-  - Switch to Jenkinsfile
-  Select git repo ``
-  `Jenkinsfile`
-  Goto IntelliJ
-  Maven job
+### CI-Build
+Switch to Jenkinsfile
+Select git repo `git@bitbucket.org:thomasanderer/pipeline-demo.git`
+`Jenkinsfile`
+Goto IntelliJ
+
+```
+      node {
+          stage ('CI-Build') {
+              def mvnHome = tool 'M3'
+              git url: 'git@bitbucket.org:thomasanderer/pipeline-demo.git'
+              
+              sh "${mvnHome}/bin/mvn -B verify"
+              junit 'target/surefire-reports/**.xml'
+              step([$class: 'FindBugsPublisher', canComputeNew: false, defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', pattern: '**/findbugs.xml', unHealthy: ''])
+              stash includes: "manifest.yml, target/pong-matcher-spring-${version}.jar", name: 'artifacts'
+          }
+      }
   ```
   
-  ```
+### Automatic Versioning
   
 
 

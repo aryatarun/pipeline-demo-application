@@ -1,34 +1,27 @@
-
-
-
 private void versioning(mvnHome) {
-    stage('Versioning') {
 
-        sh """
-            echo "MVN=`${mvnHome}/bin/mvn -q -Dexec.executable="echo" -Dexec.args='\${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.3.1:exec`" > version.properties
-            echo "COMMIT=`git rev-parse --short HEAD`" >> version.properties
-            echo "TIMESTAMP=`date +\"%Y%M%d_%H%M%S\"`" >> version.properties
+    sh """
+        echo "MVN=`${mvnHome}/bin/mvn -q -Dexec.executable="echo" -Dexec.args='\${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.3.1:exec`" > version.properties
+        echo "COMMIT=`git rev-parse --short HEAD`" >> version.properties
+        echo "TIMESTAMP=`date +\"%Y%M%d_%H%M%S\"`" >> version.properties
         """
-        def pomVersion = readProperties file: 'version.properties'
-        echo "Pom-Version=$pomVersion"
+    def pomVersion = readProperties file: 'version.properties'
+    echo "Pom-Version=$pomVersion"
 
-        def version = "${pomVersion['MVN']}-${pomVersion['TIMESTAMP']}_${pomVersion['COMMIT']}"
-        echo "Automated version: ${version}"
+    def version = "${pomVersion['MVN']}-${pomVersion['TIMESTAMP']}_${pomVersion['COMMIT']}"
+    echo "Automated version: ${version}"
 
-        sh "${mvnHome}/bin/mvn versions:set -DnewVersion=\"${version}\""
+    sh "${mvnHome}/bin/mvn versions:set -DnewVersion=\"${version}\""
 
-        //Should push the version back to repo
-        return version
-    }
+    //Should push the version back to repo
+    return version
 }
 
 private void executeCiBuild(mvnHome, version) {
-    stage('CI-Build') {
-        sh "${mvnHome}/bin/mvn -B verify"
-        junit 'target/surefire-reports/**.xml'
-        step([$class: 'FindBugsPublisher', canComputeNew: false, defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', pattern: '**/findbugs.xml', unHealthy: ''])
-        stash includes: "manifest.yml, target/pong-matcher-spring-${version}.jar", name: 'artifacts'
-    }
+    sh "${mvnHome}/bin/mvn -B verify"
+    junit 'target/surefire-reports/**.xml'
+    step([$class: 'FindBugsPublisher', canComputeNew: false, defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', pattern: '**/findbugs.xml', unHealthy: ''])
+    stash includes: "manifest.yml, target/pong-matcher-spring-${version}.jar", name: 'artifacts'
 }
 
 
@@ -71,9 +64,15 @@ def version = ""
 
 node {
     def mvnHome = tool 'M3'
-    git url: 'git@bitbucket.org:thomasanderer/pipeline-demo.git'
-    version = versioning(mvnHome)
-    executeCiBuild(mvnHome, version)
+    stage('Checkout') {
+        git url: 'git@bitbucket.org:thomasanderer/pipeline-demo.git'
+    }
+    stage('Versioning') {
+        version = versioning(mvnHome)
+    }
+    stage('CI-Build') {
+        executeCiBuild(mvnHome, version)
+    }
 }
 
 
