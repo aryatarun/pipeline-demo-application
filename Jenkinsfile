@@ -76,6 +76,7 @@ node {
     def mvnHome = tool 'M3'
     stage('Checkout') {
         git url: 'git@bitbucket.org:thomasanderer/pipeline-demo.git'
+        stash includes: "Deploy.Jenkinsfile", name: 'deploy'
     }
     stage('Versioning') {
         version = versioning(mvnHome)
@@ -99,6 +100,7 @@ stage('Acceptance') {
 
 node {
     stage('Production') {
+        unstash name: 'deploy'
         unstash name: 'artifacts'
         deployer = load 'Deploy.Jenkinsfile'
         deployer.blueGreenDeploy("cf-demo-andrena-prod", version, "target/pong-matcher-spring-${version}.jar", "cf-demo-andrena-prod")
