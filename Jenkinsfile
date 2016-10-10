@@ -1,9 +1,52 @@
-node {
-    stage('CI-Build') {
-        def mvnHome = tool 'M3'
-        sh "${mvnHome}/bin/mvn -B verify"
-        junit 'target/surefire-reports/**.xml'
-        step([$class: 'FindBugsPublisher', canComputeNew: false, defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', pattern: '**/findbugs.xml', unHealthy: ''])
+def version = ""
 
+node {
+    def mvnHome = tool 'M3'
+    stage('Checkout') {
+        git url: 'git@bitbucket.org:thomasanderer/pipeline-demo.git'
+        stash includes: "Deploy.Jenkinsfile", name: 'deploy'
     }
+    stage('Versioning') {
+        version = versioning(mvnHome)
+    }
+    stage('CI-Build') {
+        executeCiBuild(mvnHome, version)
+    }
+}
+
+
+private void versioning(mvnHome) {
+
+    sh """
+        echo "MVN=`${mvnHome}/bin/mvn -q -Dexec.executable="echo" -Dexec.args='\${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.3.1:exec`" > version.properties
+        echo "COMMIT=`git rev-parse --short HEAD`" >> version.properties
+        echo "TIMESTAMP=`date +\"%Y%m%d_%H%M%S\"`" >> version.properties
+        """
+    def pomVersion = readProperties file: 'version.properties'
+    echo "Pom-Version=$pomVersion"
+
+    def version = "${pomVersion['MVN']}-${pomVersion['TIMESTAMP']}_${pomVersion['COMMIT']}"
+    echo "Automated version: ${version}"
+
+    sh "${mvnHome}/bin/mvn versions:set -DnewVersion=\"${version}\""
+
+    pushPomBuildTag(version)
+
+    return version
+}
+
+private void pushPomBuildTag(version) {
+    sh """
+        git add pom.xml
+        git commit -m "versioning $version"
+        git tag BUILD_$version
+        git push origin BUILD_$version
+    """
+}
+
+private void executeCiBuild(mvnHome, version) {
+    sh "${mvnHome}/bin/mvn -B verify"
+    junit 'target/surefire-reports/**.xml'
+    step([$class: 'FindBugsPublisher', canComputeNew: false, defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', pattern: '**/findbugs.xml', unHealthy: ''])
+    stash includes: "manifest.yml, target/pong-matcher-spring-${version}.jar", name: 'artifacts'
 }
