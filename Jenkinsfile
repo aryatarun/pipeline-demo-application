@@ -17,7 +17,11 @@ node {
 stage('Acceptance') {
     deployToCf(version)
 
-    runAcceptanceTest()
+    parallel automated: {
+        runAcceptanceTest()
+    }, manual: {
+        manualAcceptanceCheck()
+    }
 }
 
 
@@ -83,6 +87,13 @@ private void runAcceptanceTest() {
             docker build -t pong-matcher-acceptance .
             docker run --name acceptance --rm -e \"HOST=$testHost\" pong-matcher-acceptance
         """
+    }
+}
+
+
+private void manualAcceptanceCheck() {
+    node {
+        input("Manual acceptance tests successfully?")
     }
 }
 
