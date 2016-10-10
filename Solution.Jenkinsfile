@@ -3,7 +3,7 @@ private void versioning(mvnHome) {
     sh """
         echo "MVN=`${mvnHome}/bin/mvn -q -Dexec.executable="echo" -Dexec.args='\${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.3.1:exec`" > version.properties
         echo "COMMIT=`git rev-parse --short HEAD`" >> version.properties
-        echo "TIMESTAMP=`date +\"%Y%M%d_%H%M%S\"`" >> version.properties
+        echo "TIMESTAMP=`date +\"%Y%m%d_%H%M%S\"`" >> version.properties
         """
     def pomVersion = readProperties file: 'version.properties'
     echo "Pom-Version=$pomVersion"
