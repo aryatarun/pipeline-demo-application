@@ -55,7 +55,7 @@ private void runAcceptanceTest() {
     node {
         def testHost = "http://cf-demo-andrena-test.aws.ie.a9sapp.eu"
 
-        git url: 'git@bitbucket.org:thomasanderer/pongmatcher-acceptance-fixed.git'
+        git url: 'git@github.com:andrena/pipeline-demo-acceptance.git'
 
         sh """#!/bin/bash -ex
             docker build -t pong-matcher-acceptance .
@@ -75,7 +75,7 @@ def version = ""
 node {
     def mvnHome = tool 'M3'
     stage('Checkout') {
-        git url: 'git@bitbucket.org:thomasanderer/pipeline-demo.git'
+        git url: 'git@github.com:andrena/pipeline-demo-application.git'
         stash includes: "Deploy.Jenkinsfile", name: 'deploy'
     }
     stage('Versioning') {
