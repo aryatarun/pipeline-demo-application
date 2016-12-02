@@ -1,5 +1,5 @@
 def blueGreenDeploy(appname, version, apppath, mainroute) {
-    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '3cd9dd1f-8015-4bc1-9e2b-329c6fa267de', passwordVariable: 'CF_PASSWORD', usernameVariable: 'CF_USERNAME']]) {
+    withCred  entials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '3cd9dd1f-8015-4bc1-9e2b-329c6fa267de', passwordVariable: 'CF_PASSWORD', usernameVariable: 'CF_USERNAME']]) {
         withEnv(["APPNAME=${appname}-${version}", "APPPATH=${apppath}", "MAINROUTE=${mainroute}"]) {
             sh '''#!/bin/bash -ex
                 cf login -a https://api.aws.ie.a9s.eu -o thomas_rauner_andrena_de -s production -u $CF_USERNAME -p $CF_PASSWORD
