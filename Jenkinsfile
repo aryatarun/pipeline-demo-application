@@ -3,7 +3,8 @@ def version = ""
 node {
     def mvnHome = tool 'M3'
     stage('Checkout') {
-        git url: 'git@bitbucket.org:thomasanderer/pipeline-demo.git'
+        //git url: 'git@bitbucket.org:thomasanderer/pipeline-demo.git'
+        git url: 'https://github.com/aryatarun/pipeline-demo-application'
         stash includes: "Deploy.Jenkinsfile", name: 'deploy'
     }
     stage('Versioning') {
